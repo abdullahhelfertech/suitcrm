@@ -200,8 +200,8 @@ class SubpanelQuickCreate
      *  3. custom/module/editviewdefs.php
      *  4. module/editviewdefs.php
      *
-     * @param string $module
-     * @param string $view
+     * @param $module
+     * @param $view
      * @return string The path to the viewdefs file to use
      */
     public function getModuleViewDefsSourceFile($module, $view)

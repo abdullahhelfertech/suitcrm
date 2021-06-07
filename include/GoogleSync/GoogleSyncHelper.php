@@ -96,8 +96,7 @@ class GoogleSyncHelper
         $timeArray['gModified'] = strtotime($event->getUpdated());
 
         // Get last modified of SuiteCRM event
-        $date = !empty($meeting->fetched_row['date_modified']) ? $meeting->fetched_row['date_modified']. ' UTC' : 'now';
-        $timeArray['sModified'] = strtotime($date); // SuiteCRM stores the timedate as UTC in the DB
+        $timeArray['sModified'] = strtotime($meeting->fetched_row['date_modified'] . ' UTC'); // SuiteCRM stores the timedate as UTC in the DB
 
         // Get the last sync time of SuiteCRM event
         $timeArray['lastSync'] = 0;

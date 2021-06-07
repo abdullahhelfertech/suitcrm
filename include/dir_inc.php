@@ -42,16 +42,11 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 
 
-require_once 'include/SugarCache/SugarCache.php';
 
 function copy_recursive($source, $dest)
 {
     if (is_file($source)) {
-        $result = copy($source, $dest);
-        if ((new SplFileInfo($dest))->getExtension() == 'php') {
-            SugarCache::cleanFile($dest);
-        }
-        return $result;
+        return(copy($source, $dest));
     }
     if (!is_dir($dest)) {
         sugar_mkdir($dest);

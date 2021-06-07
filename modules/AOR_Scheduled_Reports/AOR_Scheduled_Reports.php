@@ -191,8 +191,7 @@ class AOR_Scheduled_Reports extends basic
             return true;
         }
 
-        $lastRun = $this->last_run ? $timedate->fromDb($this->last_run) : $timedate->fromDb($this->date_entered);
-        
+        $lastRun = $timedate->fromDb($this->last_run);
         $this->handleTimeZone($lastRun);
         $next = $cron->getNextRunDate($lastRun);
 

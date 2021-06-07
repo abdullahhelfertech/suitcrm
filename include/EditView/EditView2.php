@@ -261,10 +261,9 @@ class EditView
                     sugar_mkdir('modules/' . $this->module . '/metadata');
                 }
 
-                sugar_file_put_contents(
-                    'modules/' . $this->module . '/metadata/' . $metadataFileName . '.php',
-                    $parser->parse($htmlFile, $dictionary[$focus->object_name]['fields'], $this->module)
-                );
+                $fp = sugar_fopen('modules/' . $this->module . '/metadata/' . $metadataFileName . '.php', 'w');
+                fwrite($fp, $parser->parse($htmlFile, $dictionary[$focus->object_name]['fields'], $this->module));
+                fclose($fp);
             }
 
             // Flag an error... we couldn't create the best guess meta-data file

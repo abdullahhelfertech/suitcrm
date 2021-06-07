@@ -403,21 +403,19 @@ background-position: -{$offset_x}px -{$offset_y}px;
                 if ($this->cssMinify) {
                     $css_content = cssmin::minify($css_content);
                 }
-                sugar_file_put_contents(
-                    "$outputDir/$cssFileName",
-                    $css_content,
-                    $fileMode == 'a' ? FILE_APPEND : 0
-                );
+                $fh = fopen("$outputDir/$cssFileName", $fileMode);
+                fwrite($fh, $css_content);
+                fclose($fh);
 
                 /* save metadata */
                 $add_php_tag = (file_exists("$outputDir/$metaFileName") && $isRepeat) ? false : true;
-                $fh = sugar_fopen("$outputDir/$metaFileName", $fileMode);
+                $fh = fopen("$outputDir/$metaFileName", $fileMode);
                 if ($add_php_tag) {
                     fwrite($fh, '<?php');
                 }
                 fwrite($fh, "\n/* sprites metadata - $name */\n");
                 fwrite($fh, $metadata."\n");
-                sugar_fclose($fh);
+                fclose($fh);
 
             // if width & height
             } else {

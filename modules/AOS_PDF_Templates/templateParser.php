@@ -56,7 +56,7 @@ class templateParser
      * @return mixed
      * @throws Exception
      */
-    public static function parse_template_bean($string, $key, &$focus)
+    public function parse_template_bean($string, $key, &$focus)
     {
         global $app_strings, $sugar_config;
         $repl_arr = array();
@@ -65,16 +65,21 @@ class templateParser
         foreach ($focus->field_defs as $field_def) {
             if (isset($field_def['name']) && $field_def['name'] != '') {
                 $fieldName = $field_def['name'];
-
-                if (empty($focus->$fieldName)) {
-                    $repl_arr[$key . '_' . $fieldName] = '';
-                    continue;
-                }
-
                 if ($field_def['type'] == 'currency') {
-                    $repl_arr[$key . "_" . $fieldName] = currency_format_number($focus->$fieldName, $params = array('currency_symbol' => false));
+                    $params = array(
+                        'currency_symbol' => false
+                    );
+
+                    $repl_arr[$key . "_" . $fieldName] = currency_format_number(
+                        $focus->{$fieldName},
+                        $params
+                    );
                 } elseif (($field_def['type'] == 'radioenum' || $field_def['type'] == 'enum' || $field_def['type'] == 'dynamicenum') && isset($field_def['options'])) {
-                    $repl_arr[$key . "_" . $fieldName] = translate($field_def['options'], $focus->module_dir, $focus->$fieldName);
+                    $repl_arr[$key . "_" . $fieldName] = translate(
+                        $field_def['options'],
+                        $focus->module_dir,
+                        $focus->{$fieldName}
+                    );
                 } elseif ($field_def['type'] == 'multienum' && isset($field_def['options'])) {
                     $mVals = unencodeMultienum($focus->{$fieldName});
                     $translatedVals = array();
@@ -126,7 +131,7 @@ class templateParser
 
         foreach ($repl_arr as $name => $value) {
             if (strpos($name, 'product_discount') !== false || strpos($name, 'quotes_discount') !== false) {
-                if ($value !== '' && isset($repl_arr['aos_products_quotes_discount'])) {
+                if ($value !== '') {
                     if ($isValidator->isPercentageField($repl_arr['aos_products_quotes_discount'])) {
                         $sep = get_number_separators();
                         $value = rtrim(
@@ -152,9 +157,10 @@ class templateParser
                 $sep = get_number_separators();
                 $value = rtrim(rtrim(format_number($value), '0'), $sep[1]) . $app_strings['LBL_PERCENTAGE_SYMBOL'];
             }
-            if (!empty($focus->field_defs[$name]['dbType'])
-                && $focus->field_defs[$name]['dbType'] === 'datetime'
-                && (strpos($name, 'date') > 0 || strpos($name, 'expiration') > 0)
+
+            if (
+                $focus->field_defs[$name]['dbType'] == 'datetime' &&
+                (strpos($name, 'date') > 0 || strpos($name, 'expiration') > 0)
             ) {
                 if ($value != '') {
                     $dt = explode(' ', $value);
@@ -166,14 +172,17 @@ class templateParser
                     }
                 }
             }
+
             if ($value != '' && is_string($value)) {
                 $string = str_replace("\$$name", $value, $string);
-            } elseif (strpos($name, 'address') > 0) {
-                $string = str_replace("\$$name<br />", '', $string);
-                $string = str_replace("\$$name <br />", '', $string);
-                $string = str_replace("\$$name", '', $string);
             } else {
-                $string = str_replace("\$$name", '&nbsp;', $string);
+                if (strpos($name, 'address') > 0) {
+                    $string = str_replace("\$$name<br />", '', $string);
+                    $string = str_replace("\$$name <br />", '', $string);
+                    $string = str_replace("\$$name", '', $string);
+                } else {
+                    $string = str_replace("\$$name", '&nbsp;', $string);
+                }
             }
         }
 

@@ -1,11 +1,14 @@
 <?php
+if (!defined('sugarEntry') || !sugarEntry) {
+    die('Not A Valid Entry Point');
+}
 /**
  *
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2021 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2018 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -38,9 +41,8 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-if (!defined('sugarEntry') || !sugarEntry) {
-    die('Not A Valid Entry Point');
-}
+
+
 
 require_once('include/utils/progress_bar_utils.php');
 require_once('include/utils/zip_utils.php');
@@ -644,15 +646,14 @@ function executevardefs()
 
     ob_start();
     foreach ($beanList as $beanz) {
+        // echo "Module: ".$beanz."<br>";
 
-        if(!empty($beanFiles[ $beanz ])) {
-            $path_parts = pathinfo($beanFiles[$beanz]);
-            $vardefFileName = $path_parts['dirname'] . "/vardefs.php";
-            if (file_exists($vardefFileName)) {
-                include_once($vardefFileName);
-            }
+        $path_parts = pathinfo($beanFiles[ $beanz ]);
+        $vardefFileName = $path_parts[ 'dirname' ]."/vardefs.php";
+        if (file_exists($vardefFileName)) {
+            // echo "<br>".$vardefFileName."<br>";
         }
-
+        include_once($vardefFileName);
     }
 
     echo "<html lang='en'>";
@@ -666,8 +667,8 @@ function executevardefs()
     $tables = array();
     foreach ($dictionary as $vardef) {
         $tables[] = $vardef['table'];
-        $fields[$vardef['table']] = !empty($vardef['fields']) ? $vardef['fields'] : [];
-        $comments[$vardef['table']] = !empty($vardef['comment']) ? $vardef['comment'] : '';
+        $fields[$vardef['table']] = $vardef['fields'];
+        $comments[$vardef['table']] = $vardef['comment'];
     }
 
     asort($tables);
@@ -696,12 +697,12 @@ function executevardefs()
             if (isset($v[ 'source' ])) {
                 continue;
             }
-            $columnname = !empty($v['name']) ? $v['name'] : '';
-            $columntype = !empty($v['type']) ? $v['type'] : '';
-            $columndbtype = !empty($v['dbType']) ? $v['dbType'] : '';
-            $columnlen = !empty($v['len']) ? $v['len'] : '';
-            $columncomment = !empty($v['comment']) ? $v['comment'] : '';
-            $columnrequired = !empty($v['required']) ? $v['required'] : '';
+            $columnname = $v[ 'name' ];
+            $columntype = $v[ 'type' ];
+            $columndbtype = $v[ 'dbType' ];
+            $columnlen = $v[ 'len' ];
+            $columncomment = $v[ 'comment' ];
+            $columnrequired = $v[ 'required' ];
 
             if (empty($columnlen)) {
                 $columnlen = '<i>n/a</i>';

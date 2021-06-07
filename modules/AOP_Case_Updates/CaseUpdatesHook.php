@@ -63,15 +63,13 @@ class CaseUpdatesHook
     private function arrangeFilesArray()
     {
         $count = 0;
-        if(!empty($_FILES['case_update_file'] )) {
-            foreach ($_FILES['case_update_file'] as $key => $vals) {
-                foreach ($vals as $index => $val) {
-                    if (!array_key_exists('case_update_file' . $index, $_FILES)) {
-                        $_FILES['case_update_file' . $index] = [];
-                        ++$count;
-                    }
-                    $_FILES['case_update_file' . $index][$key] = $val;
+        foreach ($_FILES['case_update_file'] as $key => $vals) {
+            foreach ($vals as $index => $val) {
+                if (!array_key_exists('case_update_file' . $index, $_FILES)) {
+                    $_FILES['case_update_file' . $index] = [];
+                    ++$count;
                 }
+                $_FILES['case_update_file' . $index][$key] = $val;
             }
         }
 

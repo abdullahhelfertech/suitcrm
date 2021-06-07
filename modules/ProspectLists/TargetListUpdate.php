@@ -1,11 +1,14 @@
 <?php
+if (!defined('sugarEntry') || !sugarEntry) {
+    die('Not A Valid Entry Point');
+}
 /**
  *
  * SugarCRM Community Edition is a customer relationship management program developed by
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2021 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2018 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -38,9 +41,6 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-if (!defined('sugarEntry') || !sugarEntry) {
-    die('Not A Valid Entry Point');
-}
 
 /*
  ARGS:
@@ -53,7 +53,10 @@ if (!defined('sugarEntry') || !sugarEntry) {
 
 require_once 'include/formbase.php';
 
-$focus = BeanFactory::newBean($_REQUEST['module']);
+global $beanFiles,$beanList;
+$bean_name = $beanList[$_REQUEST['module']];
+require_once($beanFiles[$bean_name]);
+$focus = new $bean_name();
 
 $uids = array();
 if ($_REQUEST['select_entire_list'] == '1') {
@@ -64,7 +67,7 @@ if ($_REQUEST['select_entire_list'] == '1') {
     $mass->generateSearchWhere($_REQUEST['module'], $_REQUEST['current_query_by_page']);
     $ret_array = create_export_query_relate_link_patch($_REQUEST['module'], $mass->searchFields, $mass->where_clauses);
     /* BEGIN - SECURITY GROUPS */
-    //need to hijack the $ret_array['where'] of securitygroup required
+    //need to hijack the $ret_array['where'] of securitygorup required
     if ($focus->bean_implements('ACL') && ACLController::requireSecurityGroup($focus->module_dir, 'list')) {
         require_once('modules/SecurityGroups/SecurityGroup.php');
         global $current_user;
@@ -85,7 +88,7 @@ if ($_REQUEST['select_entire_list'] == '1') {
     $result = DBManagerFactory::getInstance()->query($query, true);
     $uids = array();
     while ($val = DBManagerFactory::getInstance()->fetchByAssoc($result, false)) {
-        $uids[] = $val['id'];
+        array_push($uids, $val['id']);
     }
 } else {
     $uids = explode(',', $_POST['uids']);
@@ -95,17 +98,35 @@ if ($_REQUEST['select_entire_list'] == '1') {
 $relationship = '';
 foreach ($focus->get_linked_fields() as $field => $def) {
     if ($focus->load_relationship($field)) {
-        if ($focus->$field->getRelatedModuleName() === 'ProspectLists') {
+        if ($focus->$field->getRelatedModuleName() == 'ProspectLists') {
             $relationship = $field;
             break;
+            $relationship ='';
+            foreach ($focus->get_linked_fields() as $field => $def) {
+                if ($focus->load_relationship($field)) {
+                    if ($focus->$field->getRelatedModuleName() == 'ProspectLists') {
+                        $relationship = $field;
+                    }
+                    break;
+                }
+            }
         }
     }
 }
 
-if (!empty($relationship)) {
+if ($relationship != '') {
     foreach ($uids as $id) {
         $focus->retrieve($id);
-        if (!empty($_REQUEST['do_contacts'])) {
+        $focus->load_relationship($relationship);
+        $focus->prospect_lists->add($_REQUEST['prospect_list']);
+    }
+}
+
+
+if ($relationship != '') {
+    foreach ($uids as $id) {
+        $focus->retrieve($id);
+        if ($_REQUEST['do_contacts']) {
             $contacts = $focus->get_linked_beans('contacts', 'Contacts3');
             foreach ($contacts as $contact) {
                 $contact->load_relationship('prospect_lists');
@@ -113,10 +134,11 @@ if (!empty($relationship)) {
             }
         } else {
             $focus->load_relationship($relationship);
-            $focus->$relationship->add($_REQUEST['prospect_list']);
+            $focus->prospect_lists->add($_REQUEST['prospect_list']);
         }
     }
 }
+
 
 handleRedirect();
 exit;

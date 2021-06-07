@@ -557,13 +557,6 @@
       'reportable' => false,
       'source' => 'non-db',
     ),
-    'filecontents' => 
-    array (
-      'name' => 'filecontents',
-      'vname' => 'LBL_FILE_CONTENTS',
-      'type' => 'varchar',
-      'source' => 'non-db',
-    ),
     'aos_contracts' => 
     array (
       'name' => 'aos_contracts',

@@ -996,10 +996,14 @@ function repairTableDictionaryExtFile()
 
 
                     if ($altered) {
-                        if (function_exists('sugar_file_put_contents')) {
-                            @sugar_file_put_contents($entry, $contents);
+                        if (function_exists('sugar_fopen')) {
+                            $fp = @sugar_fopen($entry, 'w');
                         } else {
-                            file_put_contents($entry, $contents);
+                            $fp = fopen($entry, 'wb');
+                        }
+
+                        if ($fp && fwrite($fp, $contents)) {
+                            fclose($fp);
                         }
                     }
                 }

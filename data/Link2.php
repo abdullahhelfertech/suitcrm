@@ -76,9 +76,9 @@ class Link2
     protected $tempBeans = array();
 
     /**
-     * @param string $linkName name of a link field in the module's vardefs
-     * @param SugarBean $bean focus bean for this link (one half of a relationship)
-     * @param array $linkDef Optional vardef for the link in case it can't be found in the passed in bean
+     * @param  $linkName String name of a link field in the module's vardefs
+     * @param  $bean SugarBean focus bean for this link (one half of a relationship)
+     * @param  $linkDef array Optional vardef for the link in case it can't be found in the passed in bean
      * for the global dictionary
      */
     public function __construct($linkName, $bean, $linkDef = array())
@@ -577,29 +577,27 @@ class Link2
 
         foreach ($rel_keys as $key) {
             //We must use beans for LogicHooks and other business logic to fire correctly
-            $keyBean = $key;
-            if (!($keyBean instanceof SugarBean)) {
-                $keyBean = $this->getRelatedBean($keyBean);
-                if (!($keyBean instanceof SugarBean)) {
+            if (!($key instanceof SugarBean)) {
+                $key = $this->getRelatedBean($key);
+                if (!($key instanceof SugarBean)) {
                     $GLOBALS['log']->error('Unable to load related bean by id');
-//                    Note these beans as failed and continue
-                    $failures[] = $key;
-                    continue;
+
+                    return false;
                 }
             }
 
-            if (empty($keyBean->id) || empty($this->focus->id)) {
+            if (empty($key->id) || empty($this->focus->id)) {
                 return false;
             }
 
             if ($this->getSide() == REL_LHS) {
-                $success = $this->relationship->remove($this->focus, $keyBean);
+                $success = $this->relationship->remove($this->focus, $key);
             } else {
-                $success = $this->relationship->remove($keyBean, $this->focus);
+                $success = $this->relationship->remove($key, $this->focus);
             }
 
             if ($success == false) {
-                $failures[] = $keyBean->id;
+                $failures[] = $key->id;
             }
         }
 
@@ -613,7 +611,7 @@ class Link2
     /**
      * Marks the relationship deleted for this given record pair.
      *
-     * @param string $id id of the Parent/Focus SugarBean
+     * @param $id string id of the Parent/Focus SugarBean
      * @param string $related_id id or SugarBean to unrelate. Pass a SugarBean if you have it.
      *
      * @return bool true if delete was successful or false if it was not

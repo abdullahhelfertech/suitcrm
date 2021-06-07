@@ -460,7 +460,7 @@ class MysqlManager extends DBManager
 
     /**
      * Get tables like expression
-     * @param string $like
+     * @param $like string
      * @return array
      */
     public function tablesLike($like)

@@ -92,7 +92,7 @@ class SugarRelationshipFactory
     }
 
     /**
-     * @param string $relationshipName name of relationship to load
+     * @param  $relationshipName String name of relationship to load
      *
      * @return SugarRelationship|bool
      */
@@ -146,7 +146,7 @@ class SugarRelationshipFactory
     }
 
     /**
-     * @param string $relationshipName
+     * @param $relationshipName
      * @return bool
      */
     public function getRelationshipDef($relationshipName)

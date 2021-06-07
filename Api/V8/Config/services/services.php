@@ -57,8 +57,7 @@ return CustomLoader::mergeCustomArray([
     Service\RelationshipService::class => function (Container $container) {
         return new Service\RelationshipService(
             $container->get(BeanManager::class),
-            $container->get(AttributeObjectHelper::class),
-            $container->get(PaginationObjectHelper::class)
+            $container->get(AttributeObjectHelper::class)
         );
     },
 ], basename(__FILE__));

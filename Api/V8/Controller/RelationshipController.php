@@ -35,7 +35,7 @@ class RelationshipController extends BaseController
     public function getRelationship(Request $request, Response $response, array $args, GetRelationshipParams $params)
     {
         try {
-            $jsonResponse = $this->relationshipService->getRelationship($params, $request);
+            $jsonResponse = $this->relationshipService->getRelationship($params);
 
             return $this->generateResponse($response, $jsonResponse, 200);
         } catch (\Exception $exception) {

@@ -1015,6 +1015,9 @@ function fixUpFormatting($module, $field, $value)
                 $value = true;
             }
             break;
+        case 'encrypt':
+            $value = $this->encrpyt_before_save($value);
+            break;
     }
     return $value;
 }

@@ -38,7 +38,7 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-require_once 'include/utils/sugar_file_utils.php';
+
 
 class UpgradeMetaHelper
 {
@@ -339,15 +339,17 @@ class UpgradeMetaHelper
                 include('modules/'.$module_name.'/vardefs.php');
                 $bean_name = $beanList[$module_name];
                 $newFile = $this->upgrade_dir.'/modules/'.$module_name.'/metadata/'.$lowerCaseView.'defs.php';
+                $evfp = fopen($newFile, 'wb');
 
                 $bean_name = $bean_name == 'aCase' ? 'Case' : $bean_name;
-                sugar_file_put_contents($newFile, $parser->parse(
+                fwrite($evfp, $parser->parse(
                     $file,
                     $dictionary[$bean_name]['fields'],
                     $module_name,
                     true,
                     $this->path_to_master_copy.'/modules/'.$module_name.'/metadata/'.$lowerCaseView.'defs.php'
                 ));
+                fclose($evfp);
             } //if
         } //foreach
     }

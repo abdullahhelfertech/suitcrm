@@ -50,21 +50,38 @@ class RemindersController extends SugarController
         $ret = array();
         $invitees = $_REQUEST['invitees'];
         foreach ($invitees as $invitee) {
-            if (!empty($invitee['personModule']) && !empty($invitee['personModuleId']) && in_array($invitee['personModule'], $personModules)) {
-                if (empty($invitee['personName'])) {
+            if ($this->isValidInvitee($invitee)) {
+                if (!isset($invitee['personName']) || !$invitee['personName']) {
                     $person = BeanFactory::getBean($invitee['personModule'], $invitee['personModuleId']);
-                    if (empty($person->name)) {
-                        continue;
+                    if ($person) {
+                        $invitee['personName'] = $person->name;
+                    } else {
+                        LoggerManager::getLogger()->error('Error retriving person bean: ' . 
+                            $invitee['personModule'] . '::' . $invitee['personModuleId']);
                     }
-                    $invitee['personName'] = $person->name;
                 }
-                $ret[] = $invitee;
+                if (in_array($invitee['personModule'], $personModules) && isset($invitee['personName']) && $invitee['personName']) {
+                    $ret[] = $invitee;
+                }
             }
         }
 
         $inviteeJson = json_encode($ret);
         echo $inviteeJson;
         die();
+    }
+    
+    /**
+     *
+     * @param array $invitee
+     * @return boolean
+     */
+    protected function isValidInvitee($invitee)
+    {
+        $valid = 
+            isset($invitee['personModule']) && $invitee['personModule'] &&
+            isset($invitee['personModuleId']) && $invitee['personModuleId'];
+        return $valid;
     }
 
     public function action_getUserPreferencesForReminders()

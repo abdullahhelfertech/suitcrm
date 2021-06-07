@@ -176,7 +176,7 @@ function getRecordSummary(SugarBean $bean)
     $summary = array();
     ;
     foreach ($listViewDefs[$bean->module_dir] as $key => $entry) {
-        if (empty($entry['default'])) {
+        if (!$entry['default']) {
             continue;
         }
         $key = strtolower($key);

@@ -637,12 +637,7 @@ class InboundEmail extends SugarBean
             $r = $this->db->query($q);
             $a = $this->db->fetchByAssoc($r);
             $ret = array();
-            // Protect against the database fetch failing.
-            if ($a === false) {
-                $raw = null;
-            } else {
-                $raw = $this->convertToUtf8($a['raw_source']);
-            }
+            $raw = $this->convertToUtf8($a['raw_source']);
             if (empty($raw)) {
                 $raw = $app_strings['LBL_EMAIL_ERROR_VIEW_RAW_SOURCE'];
             }
@@ -4215,6 +4210,7 @@ class InboundEmail extends SugarBean
 
         if (empty($charset)) {
             $GLOBALS['log']->debug("***ERROR: InboundEmail::handleCharsetTranslation() called without a \$charset!");
+            $GLOBALS['log']->debug("***STACKTRACE: " . print_r(debug_backtrace(), true));
 
             return $text;
         }
@@ -6244,16 +6240,12 @@ class InboundEmail extends SugarBean
             $this->getImap()->setTimeout(3, 15);
 
             $opts = $this->findOptimumSettings($useSsl);
-            if (!empty($opts) && isset($opts['good']) && empty($opts['good'])) {
+            if (isset($opts['good']) && empty($opts['good'])) {
                 $ret = array_pop($opts['err']); // TODO: lost error info?
 
                 return $ret;
             }
-            if (!empty($opts) && is_array($opts['service'])) {
-                $service = $opts['service'];
-            } else {
-                $service = null;
-            }
+            $service = $opts['service'];
             $service = str_replace('foo', '', $service); // foo there to support no-item explodes
         } else {
             $service = $this->getServiceString();
@@ -7010,12 +7002,7 @@ class InboundEmail extends SugarBean
         $r = $this->db->query($query);
         $a = $this->db->fetchByAssoc($r);
 
-        // Protect against the query failing.
-        if ($a === false) {
-            return null;
-        } else {
-            return $a['message_id'];
-        }
+        return $a['message_id'];
     }
 
     /**
